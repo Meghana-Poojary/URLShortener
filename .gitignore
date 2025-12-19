@@ -1,0 +1,31 @@
+# node
+node_modules/
+
+# env
+.env
+.env.local
+.env.*.local
+
+# builds
+dist/
+build/
+
+# logs
+*.log
+
+# coverage
+coverage/
+
+# cache
+.vite/
+
+# Redis
+dump.rdb
+
+# OS
+.DS_Store
+Thumbs.db
+
+# editors
+.vscode/
+.idea/
