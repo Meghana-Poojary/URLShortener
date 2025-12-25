@@ -66,7 +66,7 @@ export default function Dashboard({ links, onLogout, onAnalytics, onDelete, long
             placeholder="https://very-long-url.com/path/to/resource" 
             className="flex-1 px-5 py-4 bg-slate-50 rounded-xl outline-none focus:ring-2 ring-indigo-500 border-none text-lg"
             required/>
-            <button onClick={shorten} className="px-8 py-4 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition flex items-center justify-center gap-2">
+            <button type="button" onClick={shorten} className="px-8 py-4 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition flex items-center justify-center gap-2">
             <Plus size={20} /> Shorten
             </button>
             </div>

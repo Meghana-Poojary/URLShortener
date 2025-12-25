@@ -51,7 +51,18 @@ export default function App() {
     getLinks();
   }, [user]);
 
-  const navigate = (newView) => setView(newView);
+  const navigate = (newView) => {
+    // Don't allow showing auth pages when already logged in
+    if ((newView === 'login' || newView === 'register') && user) {
+      setView('dashboard');
+      return;
+    }
+
+    // Allow navigating to protected views even if `user` hasn't been set
+    // immediately (prevents a brief flash caused by React state being
+    // updated asynchronously after an auth request completes).
+    setView(newView);
+  };
 
   const handleAuth = async (e) => {
     e.preventDefault();
@@ -162,7 +173,7 @@ export default function App() {
           setPassword={setPassword} 
         />
       )}
-      {view === 'dashboard' && (
+      {view === 'dashboard' && user && (
         <Dashboard 
           links={links} 
           onLogout={handleLogout} 
@@ -174,7 +185,7 @@ export default function App() {
           redirect={redirect}
         />
       )}
-      {view === 'analytics' && (
+      {view === 'analytics' && user && (
         <AnalyticsPage data={selectedUrl} analytics={analyticsData} onBack={() => navigate('dashboard')} />
       )}
     </div>
