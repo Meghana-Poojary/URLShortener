@@ -9,7 +9,7 @@ export async function Register(req, res) {
 
     try {
         const result = await pool.query(
-            "INSERT INTO users (name, email, password) VALUES ($1, $2, $3) RETURNING id, email",
+            "INSERT INTO users (name, email, password) VALUES ($1, $2, $3) RETURNING id, email, name",
             [name, email, hashedPassword]
         );
         const token = setuserid(result.rows[0]);
@@ -19,7 +19,7 @@ export async function Register(req, res) {
             secure: process.env.NODE_ENV === 'production'
         };
         res.cookie("uid", token, cookieOpts);
-        res.json({ message: "User registered successfully", user: { id: result.rows[0].id, email: result.rows[0].email } });
+        res.json({ message: "User registered successfully", user: { id: result.rows[0].id, email: result.rows[0].email, name: result.rows[0].name } });
     } catch {
         res.status(400).json({ error: "User already exists" });
     }
@@ -51,7 +51,7 @@ export async function Login(req, res) {
         secure: process.env.NODE_ENV === 'production'
     };
     res.cookie("uid", token, cookieOpts);
-    res.json({ message: "Login successful", user: { id: user.id, email: user.email } });
+    res.json({ message: "Login successful", user: { id: user.id, email: user.email, name: user.name } });
 }
 
 export async function GetCurrentUser(req, res) {

@@ -25,6 +25,18 @@ export async function ShortenUrl(req, res) {
     }
 }
 
+export async function GetUrls(req, res) {
+    const userId = req.user.id;
+
+    const result = await pool.query(
+        "SELECT id, long_url, short_url, created_at, clicks FROM urls WHERE user_id = $1 ORDER BY created_at DESC",
+        [userId]
+    );
+    // Return empty array when no urls exist for the user instead of 404
+    res.json({ urls: result.rows });
+}
+
+
 export async function RedirectUrl(req, res) {
     const { code } = req.params;
 
@@ -48,8 +60,12 @@ export async function RedirectUrl(req, res) {
         [url.id, req.ip]
     );
 
-    res.redirect(url.long_url);
-    // res.json({ longUrl: `${url.long_url}` });
+    const accept = (req.headers.accept || '').toLowerCase();
+    if (accept.includes('text/html')) {
+        return res.redirect(url.long_url);
+    }
+
+    return res.json({ longUrl: url.long_url });
 
 }
 
