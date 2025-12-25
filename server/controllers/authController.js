@@ -1,8 +1,9 @@
 import bcrypt from "bcrypt";
 import { pool } from "../db.js";
-import { setuserid } from "../services/auth.js";
+import { setuserid, getuserid } from "../services/auth.js";
 
 export async function Register(req, res) {
+    console.log(req.body);
     const { name, email, password } = req.body;
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -12,8 +13,13 @@ export async function Register(req, res) {
             [name, email, hashedPassword]
         );
         const token = setuserid(result.rows[0]);
-        res.cookie("uid", token, { httpOnly: true });
-        res.json({ message: "User registered successfully" });
+        const cookieOpts = {
+            httpOnly: true,
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+            secure: process.env.NODE_ENV === 'production'
+        };
+        res.cookie("uid", token, cookieOpts);
+        res.json({ message: "User registered successfully", user: { id: result.rows[0].id, email: result.rows[0].email } });
     } catch {
         res.status(400).json({ error: "User already exists" });
     }
@@ -28,7 +34,7 @@ export async function Login(req, res) {
     );
 
     if (result.rowCount === 0) {
-        return res.status(401).json({error: "Invalid credentials"});
+        return res.status(401).json({error: "User not found"});
     }
 
     const user = result.rows[0];
@@ -39,9 +45,24 @@ export async function Login(req, res) {
     }
 
     const token = setuserid(user);
-    res.cookie("uid", token, { httpOnly: true });
-    res.json({ message: "Login successful" });
+    const cookieOpts = {
+        httpOnly: true,
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+        secure: process.env.NODE_ENV === 'production'
+    };
+    res.cookie("uid", token, cookieOpts);
+    res.json({ message: "Login successful", user: { id: user.id, email: user.email } });
 }
+
+export async function GetCurrentUser(req, res) {
+    const userUid = req.cookies?.uid;
+    if (!userUid) return res.status(401).json({ error: "Not logged in" });
+
+    const user = getuserid(userUid); 
+    if (!user) return res.status(401).json({ error: "Invalid session" });
+    res.json({ user });
+}
+
 
 export function Logout(req, res) {
     res.clearCookie("uid");
