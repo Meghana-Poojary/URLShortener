@@ -16,12 +16,20 @@ export async function ShortenUrl(req, res) {
             [shortId, insert.rows[0].id]
         );
         res.json({ shortUrl: `short_url/${shortId}` });
-    } catch {
+    } catch (err) {
+        // If insertion failed (likely due to unique constraint), return the
+        // existing short URL and indicate that the URL already existed.
         const existing = await pool.query(
             "SELECT short_url FROM urls WHERE long_url = $1 AND user_id = $2",
             [longUrl, userId]
         );
-        res.json({ shortUrl: `short_url/${existing.rows[0].short_url}` });
+        if (existing.rowCount > 0) {
+            return res.status(200).json({ shortUrl: `short_url/${existing.rows[0].short_url}`, existing: true });
+        }
+
+        // If no existing row found, propagate the error
+        console.error('Failed to shorten URL', err);
+        return res.status(500).json({ error: 'Failed to shorten URL' });
     }
 }
 
