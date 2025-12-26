@@ -114,7 +114,7 @@ export default function App() {
       setLongUrl('');
 
       if (res.data?.existing) {
-        alert(`This URL already exists: ${res.data.shortUrl}`);
+        alert(`This URL has already been shortened, short url: ${backend_url}/${res.data.shortUrl}`);
       }
       try {
         const linksRes = await axios.get(`${backend_url}/short_url/urls`, { withCredentials: true });

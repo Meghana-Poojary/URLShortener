@@ -38,6 +38,15 @@ export default function Dashboard({ links, onLogout, onAnalytics, onDelete, long
         }
     }
 
+    function handleShortUrlCopy(e, link) {
+        e.preventDefault();
+        const full = `${backendBase}/short_url/${link.short_url}`;
+        if (e.clipboardData) {
+            e.clipboardData.setData('text/plain', full);
+        }
+        copyFullUrl(link);
+    }
+
     return (
     <div className="max-w-7xl mx-auto p-6">
         <div className="flex justify-between items-center mb-6">
@@ -93,8 +102,16 @@ export default function Dashboard({ links, onLogout, onAnalytics, onDelete, long
                 <tr key={link.id} className="hover:bg-slate-50/50 transition">
                     <td className="px-6 py-4 max-w-xs truncate font-medium">{link.long_url}</td>
                     <td className="px-6 py-4 text-indigo-600 font-bold">
-                    <div className="flex items-center gap-2">
-                        <span className="cursor-pointer" onClick={() => redirect(link.short_url)}>short_url/{link.short_url}</span>
+                    <div 
+                        className="flex items-center gap-2 select-all"
+                        onCopy={(e) => handleShortUrlCopy(e, link)}
+                    >
+                        <span 
+                            className="cursor-pointer select-all" 
+                            onClick={() => redirect(link.short_url)}
+                        >
+                            short_url/{link.short_url}
+                        </span>
                         <button
                         onClick={(e) => { e.stopPropagation(); copyFullUrl(link); }}
                         className="text-slate-400 hover:text-slate-600 bg-slate-100 hover:bg-slate-200 p-1 rounded-md text-sm transition"
