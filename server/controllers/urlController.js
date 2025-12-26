@@ -17,8 +17,6 @@ export async function ShortenUrl(req, res) {
         );
         res.json({ shortUrl: `short_url/${shortId}` });
     } catch (err) {
-        // If insertion failed (likely due to unique constraint), return the
-        // existing short URL and indicate that the URL already existed.
         const existing = await pool.query(
             "SELECT short_url FROM urls WHERE long_url = $1 AND user_id = $2",
             [longUrl, userId]

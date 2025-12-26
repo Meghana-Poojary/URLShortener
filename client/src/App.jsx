@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import LandingPage from './components/LandingPage.jsx';
 import AuthPage from './components/AuthPage.jsx';
@@ -24,7 +24,10 @@ export default function App() {
         setUser(res.data.user);
         setView('dashboard');
       } catch (err) {
-        setView('landing');
+        // Only set to landing if the user hasn't already navigated
+        // to an auth page (prevents a race where a user clicks "Login"
+        // while this check is still running and gets bounced back).
+        if (!userNavigatedToAuthRef.current) setView('landing');
       }
     };
 
@@ -51,11 +54,21 @@ export default function App() {
     getLinks();
   }, [user]);
 
+  const userNavigatedToAuthRef = useRef(false);
+
   const navigate = (newView) => {
     // Don't allow showing auth pages when already logged in
     if ((newView === 'login' || newView === 'register') && user) {
       setView('dashboard');
       return;
+    }
+
+    // Track when the user intentionally navigates to an auth page so
+    // the initial auth check won't override their choice.
+    if (newView === 'login' || newView === 'register') {
+      userNavigatedToAuthRef.current = true;
+    } else {
+      userNavigatedToAuthRef.current = false;
     }
 
     // Allow navigating to protected views even if `user` hasn't been set
