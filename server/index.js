@@ -7,6 +7,7 @@ import authRoutes from "./routes/authRoutes.js";
 import urlRoutes from "./routes/urlRoutes.js";
 
 dotenv.config();
+app.set("trust proxy", 1);
 
 const app = express();
 const PORT = process.env.PORT || 5000;
