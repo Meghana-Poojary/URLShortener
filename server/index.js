@@ -7,11 +7,12 @@ import authRoutes from "./routes/authRoutes.js";
 import urlRoutes from "./routes/urlRoutes.js";
 
 dotenv.config();
-app.set("trust proxy", 1);
+
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+app.set("trust proxy", 1);
 app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());
 app.use(cookieParser());
