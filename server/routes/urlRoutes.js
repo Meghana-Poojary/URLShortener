@@ -8,6 +8,6 @@ router.post("/shorten", requireAuth, ShortenUrl);
 router.get("/urls", requireAuth, GetUrls);
 router.get("/analytics/:id", requireAuth, GetAnalytics);
 router.delete("/:id", requireAuth, DeleteUrl);
-router.get("/short_url/:code", RedirectUrl);
+router.get("/:code", RedirectUrl);
 
 export default router;
